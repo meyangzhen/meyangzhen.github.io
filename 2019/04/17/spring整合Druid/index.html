@@ -16,7 +16,7 @@
 <meta property="og:description" content="##Spring 整合 Druid    1.第一步：导入依赖（一个是alibaba的druid，另一个是MySQL驱动jar包） 2.配置数据库的连接（properties文件）  3.创建一个配置文件(Spring-context-druid.xml)     *3.1,加载属性配置properties文件     *3.2，数据源配置，使用Druid数据连接池         *3.2.1数">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2019-04-17T07:08:25.000Z">
-<meta property="article:modified_time" content="2020-06-18T11:04:42.574Z">
+<meta property="article:modified_time" content="2020-06-18T11:14:19.909Z">
 <meta property="article:author" content="振 宰">
 <meta name="twitter:card" content="summary">
   
@@ -183,9 +183,9 @@
         *3.2.1数据源驱动类和基本属性url，user，password
         *3.2.2配置初始化大小
         *3.2.3配置获取连接等待超时的时间
-        3.2.4配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
-        3.2.5配置一个连接在连接池中最小生存时间，毫秒
-        3.2.6 配置监控统计拦截的filters
+        *3.2.4配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+        *3.2.5配置一个连接在连接池中最小生存时间，毫秒
+        *3.2.6 配置监控统计拦截的filters
 
 4.配置Druid监控中心（在web.xml配置）
 
