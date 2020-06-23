@@ -8,15 +8,15 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>开发Spring项目的时Spring整合Druid的笔记整理 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="##Spring 整合 Druid    1.第一步：导入依赖（一个是alibaba的druid，另一个是MySQL驱动jar包） 2.配置数据库的连接（properties文件）  3.创建一个配置文件(Spring-context-druid.xml)     *3.1,加载属性配置properties文件     *3.2，数据源配置，使用Druid数据连接池         *3.2.1数">
+  <meta name="description" content="Spring 整合 Druid1.第一步：导入依赖（一个是alibaba的druid，另一个是MySQL驱动jar包）  2.配置数据库的连接（properties文件）  3.创建一个配置文件(Spring-context-druid.xml)     *3.1,加载属性配置properties文件     *3.2，数据源配置，使用Druid数据连接池         *3.2.1数据源驱动类">
 <meta property="og:type" content="article">
 <meta property="og:title" content="开发Spring项目的时Spring整合Druid的笔记整理">
 <meta property="og:url" content="http://yoursite.com/2019/04/17/spring%E6%95%B4%E5%90%88Druid/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="##Spring 整合 Druid    1.第一步：导入依赖（一个是alibaba的druid，另一个是MySQL驱动jar包） 2.配置数据库的连接（properties文件）  3.创建一个配置文件(Spring-context-druid.xml)     *3.1,加载属性配置properties文件     *3.2，数据源配置，使用Druid数据连接池         *3.2.1数">
+<meta property="og:description" content="Spring 整合 Druid1.第一步：导入依赖（一个是alibaba的druid，另一个是MySQL驱动jar包）  2.配置数据库的连接（properties文件）  3.创建一个配置文件(Spring-context-druid.xml)     *3.1,加载属性配置properties文件     *3.2，数据源配置，使用Druid数据连接池         *3.2.1数据源驱动类">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2019-04-17T07:08:25.000Z">
-<meta property="article:modified_time" content="2020-06-18T11:14:19.909Z">
+<meta property="article:modified_time" content="2020-06-23T04:50:47.156Z">
 <meta property="article:author" content="振 宰">
 <meta name="twitter:card" content="summary">
   
@@ -176,8 +176,9 @@
       
         
         
-          <p>##Spring 整合 Druid<br>    1.第一步：导入依赖（一个是alibaba的druid，另一个是MySQL驱动jar包）</p>
-<pre><code>2.配置数据库的连接（properties文件）
+          <h2 id="Spring-整合-Druid"><a href="#Spring-整合-Druid" class="headerlink" title="Spring 整合 Druid"></a>Spring 整合 Druid</h2><pre><code>1.第一步：导入依赖（一个是alibaba的druid，另一个是MySQL驱动jar包）
+
+2.配置数据库的连接（properties文件）
 
 3.创建一个配置文件(Spring-context-druid.xml)
     *3.1,加载属性配置properties文件
