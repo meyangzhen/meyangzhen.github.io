@@ -6,13 +6,17 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2020 | Hexo</title>
+  <title>sentinel简介与实践 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/archives/2020/index.html">
+  <meta name="description" content="一、什么是Sentinel:Sentinel是阿里开源的项目，提供了流量控制、熔断降级、系统负载保护等多个维度来保障服务之间的稳定性。官网：https:&#x2F;&#x2F;github.com&#x2F;alibaba&#x2F;Sentinel&#x2F;wiki Sentinel主要特性： Sentinel与Hystrix的区别 关于Sentinel与Hystrix的区别见：https:&#x2F;&#x2F;yq.aliyun.com&#x2F;articles&#x2F;6">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sentinel简介与实践">
+<meta property="og:url" content="http://yoursite.com/2020/03/05/Sentinel%E7%AE%80%E4%BB%8B%E4%B8%8E%E5%AE%9E%E8%B7%B5/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="一、什么是Sentinel:Sentinel是阿里开源的项目，提供了流量控制、熔断降级、系统负载保护等多个维度来保障服务之间的稳定性。官网：https:&#x2F;&#x2F;github.com&#x2F;alibaba&#x2F;Sentinel&#x2F;wiki Sentinel主要特性： Sentinel与Hystrix的区别 关于Sentinel与Hystrix的区别见：https:&#x2F;&#x2F;yq.aliyun.com&#x2F;articles&#x2F;6">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-03-05T01:08:33.000Z">
+<meta property="article:modified_time" content="2020-06-23T10:13:15.421Z">
 <meta property="article:author" content="振 宰">
 <meta name="twitter:card" content="summary">
   
@@ -150,76 +154,443 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-Sentinel简介与实践" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      sentinel简介与实践
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/03/05/Sentinel%E7%AE%80%E4%BB%8B%E4%B8%8E%E5%AE%9E%E8%B7%B5/" class="archive-article-date">
+
+        
+        <a href="/2020/03/05/Sentinel%E7%AE%80%E4%BB%8B%E4%B8%8E%E5%AE%9E%E8%B7%B5/" class="archive-article-date">
   	<time datetime="2020-03-05T01:08:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-05</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/03/05/Sentinel%E7%AE%80%E4%BB%8B%E4%B8%8E%E5%AE%9E%E8%B7%B5/">sentinel简介与实践</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        
+        
+          <h2 id="一、什么是Sentinel"><a href="#一、什么是Sentinel" class="headerlink" title="一、什么是Sentinel:"></a>一、什么是Sentinel:</h2><p>Sentinel是阿里开源的项目，提供了流量控制、熔断降级、系统负载保护等多个维度来保障服务之间的稳定性。<br>官网：<a href="https://github.com/alibaba/Sentinel/wiki" target="_blank" rel="noopener">https://github.com/alibaba/Sentinel/wiki</a></p>
+<p>Sentinel主要特性：</p>
+<p>Sentinel与Hystrix的区别</p>
+<p>关于Sentinel与Hystrix的区别见：<a href="https://yq.aliyun.com/articles/633786/" target="_blank" rel="noopener">https://yq.aliyun.com/articles/633786/</a></p>
+<h3 id="总体来说："><a href="#总体来说：" class="headerlink" title="总体来说："></a>总体来说：</h3><p>Hystrix常用的线程池隔离会造成线程上下切换的overhead比较大；Hystrix使用的信号量隔离对某个资源调用的并发数进行控制，效果不错，但是无法对慢调用进行自动降级；Sentinel通过并发线程数的流量控制提供信号量隔离的功能；</p>
+<p>此外，Sentinel支持的熔断降级维度更多，可对多种指标进行流控、熔断，且提供了实时监控和控制面板，功能更为强大。</p>
+<h3 id="二、代码示例"><a href="#二、代码示例" class="headerlink" title="二、代码示例"></a>二、代码示例</h3><p>下面跟随官网中提供的Quick Start Demo，去看看如何使用Sentinel实现限流和降级。</p>
+<p>注意：</p>
+<p>JDK &gt;= 1.7;<br>Sentinel版本为1.7.0;<br>引入Sentinel jar包：</p>
+<hr>
+<pre><code>&lt;dependency&gt;
+   &lt;groupId&gt;com.alibaba.csp&lt;/groupId&gt;
+   &lt;artifactId&gt;sentinel-core&lt;/artifactId&gt;
+   &lt;version&gt;1.7.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre><hr>
+<h3 id="1、限流"><a href="#1、限流" class="headerlink" title="1、限流"></a>1、限流</h3><p>关于限流的使用和介绍见：Sentinel流量控制</p>
+<p>流量控制(Flow Control)，原理是监控应用流量的QPS或并发线程数等指标，当达到指定阈值时对流量进行控制，避免系统被瞬时的流量高峰冲垮，保障应用高可用性。</p>
+<p>下面写个简单的示例，看看如何使用Sentinel实现限流。</p>
+<p>首先写个简单的订单查询接口，用于后续接口限流示例：</p>
+<hr>
+<pre><code>@Component
+public class OrderQueryService {&lt;/br&gt;
 
-        <div class="article-info info-on-right">
-          
-          
+    public String queryOrderInfo(String orderId) {
+       System.out.println(&quot;获取订单信息:&quot; + orderId);
+       return &quot;return OrderInfo :&quot; + orderId;
+    }
+}
 
+@Controller
+@RequestMapping(&quot;order&quot;)
+public class OrderController {
+    @Autowired
+    private OrderQueryService orderQueryService;
+
+    @RequestMapping(&quot;/getOrder&quot;)
+    @ResponseBody
+    public String queryOrder1(@RequestParam(&quot;orderId&quot;) String orderId) {
+
+        return orderQueryService.queryOrderInfo(orderId);
+    }
+}</code></pre><hr>
+<p>正常情况下，调用OrderController中订单查询接口，会返回订单信息，如何控制接口访问的QPS在2以下呢？Sentienl限流提供了以下实现方式：</p>
+<p>首先需要定义限流规则，比如对哪个接口进行限流，限制的QPS为多少，限制调用方app是什么等：</p>
+<hr>
+<pre><code>public void initFlowQpsRule() {
+        List&lt;FlowRule&gt; rules = new ArrayList&lt;FlowRule&gt;();
+        FlowRule rule1 = new FlowRule();
+        rule1.setResource(KEY);
+        // QPS控制在2以内
+        rule1.setCount(2);
+        // QPS限流
+        rule1.setGrade(RuleConstant.FLOW_GRADE_QPS);
+        rule1.setLimitApp(&quot;default&quot;);
+        rules.add(rule1);
+        FlowRuleManager.loadRules(rules);
+    }</code></pre><hr>
+<p>限流实现方式有多种，本文只列出常见两种：</p>
+<p>（1）限流实现方式一: 抛出异常的方式定义资源</p>
+<p>此方式对代码侵入性较高，需要在接口调用的地方通过try-catch风格的API对代码进行包装：</p>
+<hr>
+<pre><code>/**
+ * 限流实现方式一: 抛出异常的方式定义资源
+ *
+ * @param orderId
+ * @return
+ */
+@RequestMapping(&quot;/getOrder1&quot;)
+@ResponseBody
+public String queryOrder2(@RequestParam(&quot;orderId&quot;) String orderId) {
+
+    Entry entry = null;
+    // 资源名
+    String resourceName = KEY;
+    try {
+        // entry可以理解成入口登记
+        entry = SphU.entry(resourceName);
+        // 被保护的逻辑, 这里为订单查询接口
+        return orderQueryService.queryOrderInfo(orderId);
+    } catch (BlockException blockException) {
+        // 接口被限流的时候, 会进入到这里
+        log.warn(&quot;---getOrder1接口被限流了---, exception: &quot;, blockException);
+        return &quot;接口限流, 返回空&quot;;
+    } finally {
+        // SphU.entry(xxx) 需要与 entry.exit() 成对出现,否则会导致调用链记录异常
+        if (entry != null) {
+            entry.exit();
+        }
+    }
+
+}</code></pre><hr>
+<p>测试，当QPS &gt; 2时，接口返回：</p>
+<p>（2）限流实现方式二: 注解方式定义资源</p>
+<p>上述通过try-catch风格的API可以实现限流，但是对代码侵入性太高，推荐使用注解的方式来实现。下文若不做注明，默认都会采用注解的方式实现。</p>
+<p>首先需要引入支持注解的jar包：</p>
+<hr>
+<pre><code>&lt;dependency&gt;
+     &lt;groupId&gt;com.alibaba.csp&lt;/groupId&gt;
+     &lt;artifactId&gt;sentinel-annotation-aspectj&lt;/artifactId&gt;
+     &lt;version&gt;${sentinel.version}&lt;/version&gt;
+&lt;/dependency&gt;</code></pre><hr>
+<p>Sentinel切面类配置：</p>
+<hr>
+<pre><code>@Configuration
+public class SentinelAspectConfiguration {
+
+    @Bean
+    public SentinelResourceAspect sentinelResourceAspect() {
+        return new SentinelResourceAspect();
+    }
+}</code></pre><hr>
+<p>在接口OrderQueryService中，使用注解实现订单查询接口的限流：</p>
+<hr>
+<pre><code>/**
+ * 订单查询接口, 使用Sentinel注解实现限流
+ *
+ * @param orderId
+ * @return
+ */
+@SentinelResource(value = &quot;getOrderInfo&quot;, blockHandler = &quot;handleFlowQpsException&quot;,
+        fallback = &quot;queryOrderInfo2Fallback&quot;)
+public String queryOrderInfo2(String orderId) {
+
+    // 模拟接口运行时抛出代码异常
+    if (&quot;000&quot;.equals(orderId)) {
+        throw new RuntimeException();
+    }
+
+    System.out.println(&quot;获取订单信息:&quot; + orderId);
+    return &quot;return OrderInfo :&quot; + orderId;
+}
+
+/**
+ * 订单查询接口抛出限流或降级时的处理逻辑
+ *
+ * 注意: 方法参数、返回值要与原函数保持一致
+ * @return
+ */
+public String handleFlowQpsException(String orderId, BlockException e) {
+    e.printStackTrace();
+    return &quot;handleFlowQpsException for queryOrderInfo2: &quot; + orderId;
+}
+
+/**
+ * 订单查询接口运行时抛出的异常提供fallback处理
+ *
+ * 注意: 方法参数、返回值要与原函数保持一致
+ * @return
+ */
+public String queryOrderInfo2Fallback(String orderId, Throwable e) {
+    return &quot;fallback queryOrderInfo2: &quot; + orderId;
+}</code></pre><hr>
+<p>blockHandler = “handleFlowQpsException”用来处理Sentinel 限流/熔断等错误；<br>fallback = “queryOrderInfo2Fallback”用来处理接口中业务代码所有异常(如业务代码异常、sentinel限流熔断异常等)；<br>注：以上两种处理方法中方法名、参数都需与受保护的函数保持一致。</p>
+<p>测试：</p>
+<hr>
+<pre><code>/**
+ * 限流实现方式二: 注解定义资源
+ *
+ * @param orderId
+ * @return
+ */
+@RequestMapping(&quot;/getOrder2&quot;)
+@ResponseBody
+public String queryOrder3(@RequestParam(&quot;orderId&quot;) String orderId) {
+    return orderQueryService.queryOrderInfo2(orderId);
+}</code></pre><hr>
+<p>测试结果在这里就不贴出来了，结果类似。</p>
+<p>下面就使用基于注解的方式实现Sentinel的熔断降级的demo。</p>
+<hr>
+<pre><code>@Component
+@Slf4j
+public class GoodsQueryService {
+
+    private static final String KEY = &quot;queryGoodsInfo2&quot;;
+
+    /**
+     * 模拟商品查询接口
+     *
+     * @param spuId
+     * @return
+     */
+    @SentinelResource(value = KEY, blockHandler = &quot;blockHandlerMethod&quot;, fallback = &quot;queryGoodsInfoFallback&quot;)
+    public String queryGoodsInfo(String spuId) {
+
+        // 模拟调用服务出现异常
+        if (&quot;0&quot;.equals(spuId)) {
+            throw new RuntimeException();
+        }
+
+        return &quot;query goodsinfo success, &quot; + spuId;
+    }
+
+    public String blockHandlerMethod(String spuId, BlockException e) {
+        log.warn(&quot;queryGoodsInfo222 blockHandler&quot;, e.toString());
+        return &quot;queryGoodsInfo error, blockHandlerMethod res: &quot; + spuId;
+
+    }
+
+    public String queryGoodsInfoFallback(String spuId, Throwable e) {
+        log.warn(&quot;queryGoodsInfo222 fallback&quot;, e.toString());
+        return &quot;queryGoodsInfo error, return fallback res: &quot; + spuId;
+    }
+
+    @PostConstruct
+    public void initDegradeRule() {
+        List&lt;DegradeRule&gt; rules = new ArrayList&lt;&gt;();
+        DegradeRule rule = new DegradeRule();
+        rule.setResource(KEY);
+        // 80s内调用接口出现异常次数超过5的时候, 进行熔断
+        rule.setCount(5);
+        rule.setGrade(RuleConstant.DEGRADE_GRADE_EXCEPTION_COUNT);
+        rule.setTimeWindow(80);
+        rules.add(rule);
+        DegradeRuleManager.loadRules(rules);
+    }
+}</code></pre><hr>
+<p>// 测试类</p>
+<pre><code>@Controller
+@RequestMapping(&quot;goods&quot;)
+public class GoodsController {
+
+    @Autowired
+    private GoodsQueryService goodsQueryService;
+
+    @RequestMapping(&quot;/queryGoodsInfo&quot;)
+    @ResponseBody
+    public String queryGoodsInfo(@RequestParam(&quot;spuId&quot;) String spuId) {
+        String res = goodsQueryService.queryGoodsInfo(spuId);
+        return res;
+    }
+}</code></pre><hr>
+<h3 id="三、控制台的使用"><a href="#三、控制台的使用" class="headerlink" title="三、控制台的使用"></a>三、控制台的使用</h3><p>Sentinel 提供一个轻量级的开源控制台，它提供机器发现以及健康情况管理、监控（单机和集群），规则管理和推送的功能。</p>
+<p>主要功能有：</p>
+<p>查看机器列表以及健康情况；<br>监控；<br>规则管理和推送；<br>鉴权；<br>1、启动Sentinel控制台<br>如何启动控制台见：启动控制台</p>
+<p>启动方式：</p>
+<p>（1）下载jar包，通过命令方式</p>
+<p>在<a href="https://github.com/alibaba/Sentinel/releases下载对应版本的dashboard" target="_blank" rel="noopener">https://github.com/alibaba/Sentinel/releases下载对应版本的dashboard</a> jar包，进入到该jar所在的目录，然后通过java命令运行该jar包即可：</p>
+<hr>
+<pre><code>java -Dserver.port=8080 \
+-Dcsp.sentinel.dashboard.server=localhost:8080 \
+-jar target/sentinel-dashboard.jar</code></pre><hr>
+<p>（2）git clone 整个sentinel源码，进入sentinel-dashboard模块，执行打包命令：mvn clean package，生成一个可执行的 fat jar包，然后启动控制台，输入url：localhost:8080后即可进入主页面。</p>
+<h3 id="2、客户端接入（Spring-Boot项目接入控制台）"><a href="#2、客户端接入（Spring-Boot项目接入控制台）" class="headerlink" title="2、客户端接入（Spring Boot项目接入控制台）"></a>2、客户端接入（Spring Boot项目接入控制台）</h3><p>启动了控制台模块后，控制台页面都是空的，需要接入客户端。<br>（1）首先导入与控制台通信的jar包：</p>
+<hr>
+<pre><code>&lt;dependency&gt;
+
+    &lt;groupId&gt;com.alibaba.csp&lt;/groupId&gt;
+    &lt;artifactId&gt;sentinel-transport-simple-http&lt;/artifactId&gt;
+       &lt;version&gt;${sentinel.version}&lt;/version&gt;
+
+&lt;/dependency&gt;</code></pre><hr>
+<p>（2）配置 JVM 启动参数：</p>
+<hr>
+<p>-Dproject.name=sentinel-demo -Dcsp.sentinel.dashboard.server=127.0.0.1:8080 -Dcsp.sentinel.api.port=8719</p>
+<hr>
+<p>启动应用。</p>
+<p>注：在应用中需要有触发限流、降级的初始化代码。</p>
+<p>本demo中<a href="http://localhost:8083/order/getOrder1?orderId=123接口执行多次，会触发限流操作，这时候再去看控制台：" target="_blank" rel="noopener">http://localhost:8083/order/getOrder1?orderId=123接口执行多次，会触发限流操作，这时候再去看控制台：</a></p>
+<p>可以看到，getOrderInfo接口被限流的次数。</p>
+<h3 id="4、控制台的使用"><a href="#4、控制台的使用" class="headerlink" title="4、控制台的使用"></a>4、控制台的使用</h3><p>如果我们想使用Sentinel的限流和熔断功能，除了在代码中可以硬编码外，也可直接通过控制台进行粗略的对接口进行限流和熔断。</p>
+<hr>
+<pre><code>/**
+  * 代码不加任何限流 熔断
+  * @return
+  */
+@RequestMapping(&quot;/test&quot;)
+@ResponseBody
+@SentinelResource(&quot;test&quot;)
+public String test() {
+    return &quot;test&quot;;
+}</code></pre><hr>
+<p>执行<a href="http://localhost:8083/goods/test接口动作后，在页面上簇点链路中即可看到该接口已经被统计到：" target="_blank" rel="noopener">http://localhost:8083/goods/test接口动作后，在页面上簇点链路中即可看到该接口已经被统计到：</a></p>
+<p>点击流控，对该接口新增一条流控规则，配置如下：</p>
+<p>点击新增后，</p>
+<p>再去执行接口<a href="http://localhost:8083/goods/test，当QPS超过2时，即可看到接口返回异常，达到流控效果。" target="_blank" rel="noopener">http://localhost:8083/goods/test，当QPS超过2时，即可看到接口返回异常，达到流控效果。</a></p>
+<p>当然，控制台流控规则、降级规则的使用还有很多，可以参考官方文档看看具体如何使用。</p>
+<p>PS</p>
+<p>在接入控制台过程中，发现控制台一直会报error:</p>
+<hr>
+<p>ERROR 5317 — [pool-2-thread-1] c.a.c.s.dashboard.metric.MetricFetcher   : Failed to fetch metric from <a href="http://10.200.183.30:8721/metric?startTime=1575117735000&amp;endTime=1575117741000&amp;refetch=false" target="_blank" rel="noopener">http://10.200.183.30:8721/metric?startTime=1575117735000&amp;endTime=1575117741000&amp;refetch=false</a> (ConnectionException: Connection refused)</p>
+<hr>
+<p>错误原因是控制台在收集客户端数据时，从IP地址<a href="http://10.200.183.30:8721连接不上；">http://10.200.183.30:8721连接不上；</a></p>
+<p>后发现原来开启了代理，关闭代理后就正常。</p>
+<p>参考：</p>
+<p>官方文档：<a href="https://github.com/alibaba/Sentinel/wiki" target="_blank" rel="noopener">https://github.com/alibaba/Sentinel/wiki</a></p>
+
+        
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/03/05/Sentinel%E7%AE%80%E4%BB%8B%E4%B8%8E%E5%AE%9E%E8%B7%B5/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/02/17/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/" class="archive-article-date">
-  	<time datetime="2020-02-17T07:08:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-17</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2020/02/17/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">设计模式简单总结</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/02/17/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/">设计模式简单总结</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
-    
+  
+
+  
 
 
           </div>
@@ -242,8 +613,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
